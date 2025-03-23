@@ -1,31 +1,37 @@
 package com.example.mobilecookbook
 
+import android.content.Context
 import android.os.Bundle
+import android.view.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.RatingBar
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [RecipeDetailsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+// Stałe klucze do przekazywania danych między fragmentami
+private const val ARG_RECIPE = "arg_recipe"
+private const val ARG_POSITION = "arg_position"
 class RecipeDetailsFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+    private var listener: OnRecipeInteractionListener? = null
+    private var recipe: Recipe? = null
+    private var position: Int = -1
+
+    // Wywoływane, gdy fragment zostaje dołączony do aktywności
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        // Sprawdza, czy aktywność implementuje interfejs
+        if (context is OnRecipeInteractionListener) {
+            listener = context
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            // Pobiera obiekt przepisu przekazany do fragmentu
+            recipe = it.getSerializable(ARG_RECIPE) as Recipe
+            position = it.getInt(ARG_POSITION, -1)
         }
     }
 
@@ -33,26 +39,49 @@ class RecipeDetailsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_recipe_details, container, false)
+        //Utworzenie widok na podstawie XML i zmiana na obiekt view
+        val view = inflater.inflate(R.layout.fragment_recipe_details, container, false)
+
+        val nameEditText = view.findViewById<EditText>(R.id.detailsNameEditText)
+        val ingredientsEditText = view.findViewById<EditText>(R.id.detailsIngredientsEditText)
+        val instructionsEditText = view.findViewById<EditText>(R.id.detailsInstructionsEditText)
+        val ratingBar = view.findViewById<RatingBar>(R.id.detailsRatingBar)
+
+        recipe?.let {
+            nameEditText.setText(it.name)
+            ingredientsEditText.setText(it.ingredients)
+            instructionsEditText.setText(it.instructions)
+            ratingBar.rating = it.rating
+        }
+
+        // Obsługa zmiany oceny
+        ratingBar.setOnRatingBarChangeListener { _, rating, _ ->
+            // Aktualizuje ocenę
+            recipe?.rating = rating
+
+            // Informuje aktywność, że przepis został zmieniony
+            recipe?.let { r ->
+                listener?.onRecipeUpdated(r, position)
+            }
+        }
+
+        val backButton = view.findViewById<Button>(R.id.backButton)
+        backButton.setOnClickListener {
+            // Usuwa ten fragment i wraca do poprzedniego
+            parentFragmentManager.popBackStack()
+        }
+
+        return view
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment RecipeDetailsFragment.
-         */
-        // TODO: Rename and change types and number of parameters
+        // Funkcja tworząca nową instancję fragmentu z przekazanym przepisem i jego pozycją
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(recipe: Recipe, position: Int) =
             RecipeDetailsFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putSerializable(ARG_RECIPE, recipe)
+                    putInt(ARG_POSITION, position)
                 }
             }
     }

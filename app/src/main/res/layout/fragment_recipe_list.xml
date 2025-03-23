@@ -3,17 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+    android:padding="16dp" >
 
     <Button
-        android:id="@+id/buttonAddRecipe"
-        android:layout_width="match_parent"
+        android:id="@+id/addRecipeButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Dodaj przepis" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recipeRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp" />
+
 </LinearLayout>
