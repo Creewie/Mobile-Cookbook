@@ -7,7 +7,7 @@ interface OnRecipeInteractionListener {
     fun onRecipeSelected(recipe: Recipe, position: Int)
 
     /**
-     * Gdy utwarza się nowy przepis (to w ogóle poprawnie po polsku? XD)
+     * Gdy tworzy się przepis
      */
     fun onRecipeAdded(recipe: Recipe)
 
@@ -15,4 +15,9 @@ interface OnRecipeInteractionListener {
      * Gdy przepis jest updatowany
      */
     fun onRecipeUpdated(recipe: Recipe, position: Int)
+
+    /**
+     * Gdy usuwamy przepis
+     */
+    fun onRecipeDeleted(position: Int)
 }

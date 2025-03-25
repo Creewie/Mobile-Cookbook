@@ -1,5 +1,6 @@
 package com.example.mobilecookbook
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.*
@@ -29,10 +30,32 @@ class RecipeDetailsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            // Pobiera obiekt przepisu przekazany do fragmentu
-            recipe = it.getSerializable(ARG_RECIPE) as Recipe
+            recipe = it.getSerializable(ARG_RECIPE, Recipe::class.java) as Recipe
             position = it.getInt(ARG_POSITION, -1)
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val deleteButton = view.findViewById<Button>(R.id.deleteButton)
+        deleteButton?.setOnClickListener {
+            showDeleteConfirmationDialog()
+        }
+    }
+
+    private fun showDeleteConfirmationDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Potwierdzenie usunięcia")
+            .setMessage("Czy na pewno chcesz usunąć ten przepis?")
+            .setPositiveButton("Tak") { _, _ ->
+                recipe?.let {
+                    listener?.onRecipeDeleted(position)
+                    parentFragmentManager.popBackStack()
+                }
+            }
+            .setNegativeButton("Nie", null) // Zamknij dialog bez akcji
+            .show()
     }
 
     override fun onCreateView(

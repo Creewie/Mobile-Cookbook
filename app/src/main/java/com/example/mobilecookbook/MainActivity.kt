@@ -84,6 +84,14 @@ class MainActivity : AppCompatActivity(), OnRecipeInteractionListener {
         editor.apply()
     }
 
+    override fun onRecipeDeleted(position: Int) {
+        if (position in recipeList.indices) {
+            recipeList.removeAt(position)
+            saveRecipesToPrefs()
+        }
+        supportFragmentManager.popBackStack() // Powrót do listy przepisów
+    }
+
     // Funkcja pomocnicza, żeby fragmenty mogły pobierać aktualną listę
     fun getRecipes(): MutableList<Recipe> {
         return recipeList
